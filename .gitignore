@@ -1,0 +1,81 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.env
+
+# Media and Model Files
+media/captured_photos/*
+!media/captured_photos/.gitkeep
+media/frames/*
+!media/frames/.gitkeep
+media/plate_photos/*
+!media/plate_photos/.gitkeep
+media/result_videos/*
+!media/result_videos/.gitkeep
+models/*
+!models/.gitkeep
+!models/Number_plate_recognize_last.pt
+!models/Vehicle_Detection.pt
+!models/license_detection_model.pt.pt
+!models/yolov8m.pt
+!models/yolov8n.pt
+!models/coco.txt
+
+# Test Videos and Images
+# speed_estimation/Test_video/*
+!speed_estimation/Test_video/.gitkeep
+test_videos/
+test_images/
+captured_photos/
+Plate_photo/
+Result_video/
+plate_photos/
+media/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Django
+*.log
+local_settings.py
+# db.sqlite3
+# db.sqlite3-journal
