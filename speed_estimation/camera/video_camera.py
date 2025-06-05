@@ -1,7 +1,7 @@
 from .video_processor import VideoProcessor
 
 class VideoCamera:
-    def __init__(self, video_path="speed_estimation/Test_video/v2.mp4"):
+    def __init__(self, video_path="speed_estimation/Test_video/car1.mp4"):
         """Initialize video processor"""
         self.processor = VideoProcessor(video_path)
 

@@ -11,4 +11,9 @@ urlpatterns = [
     path('speed_estimation/video_feed/', views.video_feed, name='video_feed'),
     path('speed_estimation/get_stats/', views.get_stats, name='get_stats'),
     path('', include('user_app.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Add static and media file serving for development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from ultralytics import YOLO
 import supervision as sv
 import logging
+from django.conf import settings
 
 from speed_estimation.tracking.tracker import get_tracker, BYTETracker
 from speed_estimation.utils.transform import ViewTransformer, SOURCE, TARGET
@@ -18,7 +19,7 @@ from .video_capture import VideoCapture
 logger = logging.getLogger(__name__)
 
 class VideoProcessor:
-    def __init__(self, video_path="speed_estimation/Test_video/test.mp4"):
+    def __init__(self, video_path="speed_estimation/Test_video/car.mp4"):
         """Initialize video processor with capture and processing components"""
         try:
             # Initialize video capture
@@ -235,18 +236,29 @@ class VideoProcessor:
                 clean_frame = frame.copy()
                 violation_img = clean_frame[crop_y1:crop_y2, crop_x1:crop_x2].copy()
                 
-                # Save images
+                # Save images with proper paths for Django
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                full_path = os.path.join(self.VIOLATIONS_DIR, 
-                                       f"full_violation_{timestamp}_{tracker_id}_{speed:.0f}kmh.jpg")
-                crop_path = os.path.join(self.VIOLATIONS_DIR, 
-                                       f"crop_violation_{timestamp}_{tracker_id}_{speed:.0f}kmh.jpg")
+                full_filename = f"full_violation_{timestamp}_{tracker_id}_{speed:.0f}kmh.jpg"
+                crop_filename = f"crop_violation_{timestamp}_{tracker_id}_{speed:.0f}kmh.jpg"
                 
-                cv2.imwrite(full_path, clean_frame)
-                cv2.imwrite(crop_path, violation_img)
+                # Save to media directory
+                full_path = os.path.join('Vehicle_images', full_filename)
+                crop_path = os.path.join('Vehicle_images', crop_filename)
+                
+                # Create absolute paths for saving
+                abs_full_path = os.path.join(settings.MEDIA_ROOT, full_path)
+                abs_crop_path = os.path.join(settings.MEDIA_ROOT, crop_path)
+                
+                # Ensure directories exist
+                os.makedirs(os.path.dirname(abs_full_path), exist_ok=True)
+                os.makedirs(os.path.dirname(abs_crop_path), exist_ok=True)
+                
+                # Save images
+                cv2.imwrite(abs_full_path, clean_frame)
+                cv2.imwrite(abs_crop_path, violation_img)
                 logger.info(f"Saved clean violation photos to {full_path} and {crop_path}")
                 
-                # Update vehicle data with image paths
+                # Update vehicle data with Django-compatible image paths
                 self.vehicle_data[tracker_id].update({
                     'full_image_path': full_path,
                     'crop_image_path': crop_path,
@@ -349,16 +361,22 @@ class VideoProcessor:
                 
                 # Save the plate detection image without annotations
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                plate_path = os.path.join(self.PLATES_DIR, 
-                                        f"plate_{timestamp}_{tracker_id}_{license_plate}.jpg")
+                filename = f"plate_{timestamp}_{tracker_id}_{license_plate}.jpg"
+                
+                # Save to media directory
+                plate_path = os.path.join('License_plate_images', filename)
+                abs_plate_path = os.path.join(settings.MEDIA_ROOT, plate_path)
+                
+                # Ensure directory exists
+                os.makedirs(os.path.dirname(abs_plate_path), exist_ok=True)
                 
                 # Save clean cropped image of the plate region
                 x1, y1, x2, y2 = plate_bbox
                 plate_img = vehicle_img[y1:y2, x1:x2].copy()
-                cv2.imwrite(plate_path, plate_img)
+                cv2.imwrite(abs_plate_path, plate_img)
                 logger.info(f"Saved clean plate image to {plate_path}")
                 
-                # Update database record with license plate info
+                # Update database record with license plate info using Django-compatible path
                 self._update_violation_record(tracker_id, license_plate, plate_path)
                 self.license_detected[tracker_id] = True
             else:
